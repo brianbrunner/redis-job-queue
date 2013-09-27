@@ -1,0 +1,26 @@
+{
+  "name": "redis-job-queue",
+  "version": "0.1.0",
+  "description": "A job queueing system for redis written in NodeJS",
+  "main": "redis-job-queue.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/brianbrunner/redis-job-queue.git"
+  },
+  "keywords": [
+    "redis",
+    "job",
+    "queue"
+  ],
+  "author": "Brian Brunner",
+  "license": "MIT License",
+  "bugs": {
+    "url": "https://github.com/brianbrunner/redis-job-queue/issues"
+  },
+  "dependencies": {
+    "redis": "~0.8.5"
+  }
+}
