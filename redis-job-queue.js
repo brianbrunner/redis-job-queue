@@ -1,18 +1,19 @@
 var redis = require('redis'),
     crypto = require('crypto')
 //
-// QueueConsumer
+// Consumer
 //
 // Create a new queue consumer that reads data off of the queue
 // with `queue_name`
 //
 
-module.exports.QueueConsumer = QueueConsumer = function(queue_name) {
+module.exports.Consumer = Consumer = function(queue_name) {
   this._queue_name = queue_name
   this._rcli = redis.createClient()
+  this._pub_rcli = redis.createClient()
 }
 
-QueueConsumer.prototype = {
+Consumer.prototype = {
 
   //
   // listen(callback)
@@ -20,6 +21,7 @@ QueueConsumer.prototype = {
   // Start listening for new events to be pushed to the queue, calling
   // the callback function every time new data is added to the queue.
   //
+
   listen : function(callback) {
 
     var self = this
@@ -54,17 +56,37 @@ QueueConsumer.prototype = {
 
     })
 
+  },
+
+  listenForJobs : function(callback) {
+
+    var self = this
+    this.listen(function(job) {
+
+        var job_id = job.id,
+            job_type = job.type,
+            job_data = job.data
+
+        callback(job_type, job_data, function(res) {
+
+            var message = JSON.stringify(res)
+            self._pub_rcli.publish(job_id, message)
+
+        })
+
+    })
+
   }
 
 }
 
 //
-// QueuePublisher
+// Publisher
 //
 // Publishes data to a queue, also has helper methods to create queued
 // jobs with callbacks.
 //
-module.exports.QueuePublisher = QueuePublisher = function(queue_name) {
+module.exports.Publisher = Publisher = function(queue_name) {
   this._queue_name = queue_name
   this._rcli = redis.createClient()
   this._sub_rcli = redis.createClient()
@@ -96,7 +118,7 @@ module.exports.QueuePublisher = QueuePublisher = function(queue_name) {
 
 }
 
-QueuePublisher.prototype = {
+Publisher.prototype = {
 
   // publish raw data to a queue
   publish : function(data) {
